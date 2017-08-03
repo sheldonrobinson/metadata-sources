@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # arxiv - arxiv plugin for calibre
@@ -30,8 +30,8 @@ if __name__ == '__main__':
 
     tests_list = [
         ({'identifiers': {'arxiv': "1412.7127v1"}},
-         {title_test("Surface Operators"),
-          authors_test(["Sergei Gukov"])}),
+         [title_test("Surface Operators"),
+          authors_test(["Sergei Gukov"])]),
 
         ({'title': "The Cobordism Category and Waldhausen's K-theory",
           'authors': ['Marcel Bökstedt', 'Ib Madsen']},

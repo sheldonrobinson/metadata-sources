@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # calibre-metadata - A collection of metadata sources for calibre
@@ -17,4 +17,4 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .mathscinet import Mathscinet
+from .ieeexplore import IEEEXplore

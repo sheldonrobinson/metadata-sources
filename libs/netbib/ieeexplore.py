@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # netbib - collect bibliographical data over the net
@@ -43,7 +43,6 @@ class IEEEXploreError(NetbibError):
 class IEEEXplore(NetbibBase):
     def __init__(self, browser, timeout=30):
         super(IEEEXplore, self).__init__()
-	print('Comlete super init ...')
         self.query_maxresults = 100
 
         self.search_fields = ['title', 'authors', 'id']
@@ -55,15 +54,12 @@ class IEEEXplore(NetbibBase):
 
         self.ieeexplore_url = "http://ieeexplore.ieee.org/gateway/ipsSearch.jsp"
         self.ans = []
-	
-	print('Comleted __init__  ...')
 
 
     # Internals
     # ------------------------------ #
 
     def get_matches(self, params):
-	print('Entered get_matches  ...')
         query_url = '%s?%s' % (self.ieeexplore_url, urlencode(params))
         raw = self.browser.open(query_url, timeout=self.timeout).read().strip()
         rawdata = raw.decode('utf-8', errors='replace')
@@ -84,14 +80,13 @@ class IEEEXplore(NetbibBase):
 	    if result.find('py') is not None: d['year'] = self.format_text(result.find('py').text)
 	    if result.find('publisher') is not None: d['publisher'] = self.format_text(result.find('publisher').text)
 	    if result.find('volume') is not None: d['volume'] = self.format_text(result.find('volume').text)
-	    if result.find('issue') is not None: d['number'] = self.format_text(result.find('issue').text) 
+	    if result.find('issue') is not None: d['number'] = self.format_text(result.find('issue').text)
             d['abstract'] = '<p>%s</p>' % self.format_text(result.find('abstract').text)
             if result.find('mdurl') is not None: d['url'] = self.format_url(result.find('mdurl').text)
-	    
+
 
             ans.append(d)
 
-	print('Exiting get_matches  ...')
         return ans
 
 

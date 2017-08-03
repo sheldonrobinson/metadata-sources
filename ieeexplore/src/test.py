@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # mathscinet - mathscinet metadata plugin for calibre
@@ -29,16 +29,15 @@ if __name__ == '__main__':
          title_test, authors_test)
 
     tests_list = [
-#        ({'identifiers': {"an" : "5318908"}},
-#         {title_test("A 2D Barcode-Based Mobile Payment System"),
-#          authors_test(['Jerry Gao', 'Vijay Kulkarni', 'Himanshu Ranavat', 'Lee Chang', 'Hsing Mei'])}),
+        ({'identifiers': {"an" : "5318908"}},
+         [title_test("A 2D Barcode-Based Mobile Payment System"),
+          authors_test(['Jerry Gao', 'Vijay Kulkarni', 'Himanshu Ranavat', 'Lee Chang', 'Hsing Mei'])]),
 
         ({'title': "A 2D Barcode-Based Mobile Payment System", 'authors':['Jerry Gao']},
-        {title_test("A 2D Barcode-Based Mobile Payment System", exact=True)})
+        [title_test("A 2D Barcode-Based Mobile Payment System", exact=True)])
 
         ]
 
-    print('Running test_identify_plugin(IEEEXplore) ...')
     test_identify_plugin("IEEEXplore", tests_list)
 
 
