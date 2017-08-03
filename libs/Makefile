@@ -1,3 +1,3 @@
 
 test: 
-	python2 -B -m netbib.test
+	python -B -m netbib.test

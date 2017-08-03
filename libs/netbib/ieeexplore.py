@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import (unicode_literals, division)
+from __future__ import (unicode_literals, division, priint_function)
 
 import time
 import sys
@@ -36,54 +36,62 @@ from .base import NetbibBase, NetbibError
 
 
 
-class ArxivError(NetbibError):
+class IEEEXploreError(NetbibError):
     pass
 
 
-class Arxiv(NetbibBase):
+class IEEEXplore(NetbibBase):
     def __init__(self, browser, timeout=30):
-        super(Arxiv, self).__init__()
-
+        super(IEEEXplore, self).__init__()
+	print('Comlete super init ...')
         self.query_maxresults = 100
 
         self.search_fields = ['title', 'authors', 'id']
-        self.idkey = 'arxiv'
+        self.idkey = 'an'
 
         self.timeout = timeout
         self.browser = browser
         self.sleep_time = 0.2
 
-        self.arxiv_url = "http://export.arxiv.org/api/query"
+        self.ieeexplore_url = "http://ieeexplore.ieee.org/gateway/ipsSearch.jsp"
         self.ans = []
-
+	
+	print('Comleted __init__  ...')
 
 
     # Internals
     # ------------------------------ #
 
     def get_matches(self, params):
-        at = "{http://www.w3.org/2005/Atom}"
-        query_url = '%s?%s' % (self.arxiv_url, urlencode(params))
+	print('Entered get_matches  ...')
+        query_url = '%s?%s' % (self.ieeexplore_url, urlencode(params))
         raw = self.browser.open(query_url, timeout=self.timeout).read().strip()
         rawdata = raw.decode('utf-8', errors='replace')
         xmldata = xml.etree.ElementTree.fromstring(rawdata)
-        entries = xmldata.findall(at+"entry")
+        entries = xmldata.findall("document")
 
         ans = []
         for result in entries:
             d = {}
-            d['id'] = self.format_id(result.find(at+'id').text)
-            d['title'] = self.format_title(result.find(at+'title').text)
-            d['authors'] = [self.format_text(e.text) for e in result.findall(at+'author/'+at+'name')]
-            d['subject'] = [self.format_text(e.get('term')) for e in result.findall(at+'category')]
-            d['updated'] = self.format_text(result.find(at+'updated').text)
-            d['abstract'] = '<p>%s</p>' % self.format_text(result.find(at+'summary').text)
-            d['updated'] = self.format_text(result.find(at+'updated').text)
-	    d['pubdate'] = self.format_text(result.find(at+'published').text)
-            d['url'] = self.format_url(result.find(at+'link').get('href'))
+            d['id'] = result.find('arnumber').text
+	    if result.find('isbn') is not None: d['isbn'] = result.find('isbn').text
+	    if result.find('issn') is not None: d['issn'] = result.find('issn').text
+	    if result.find('doi') is not None: d['doi'] = result.find('doi').text
+            d['title'] = self.format_title(result.find('title').text)
+            d['authors'] = [self.format_text(e.text) for e in result.find('authors').text.split(';')]
+            d['subject'] = [self.format_text(e.text) for e in [result.findall('controlledterms/term'), result.findall('thesaurusterms/term')]]
+	    if result.find('pubtitle') is not None:  d['series'] = self.format_text(result.find('pubtitle').text)
+	    if result.find('py') is not None: d['year'] = self.format_text(result.find('py').text)
+	    if result.find('publisher') is not None: d['publisher'] = self.format_text(result.find('publisher').text)
+	    if result.find('volume') is not None: d['volume'] = self.format_text(result.find('volume').text)
+	    if result.find('issue') is not None: d['number'] = self.format_text(result.find('issue').text) 
+            d['abstract'] = '<p>%s</p>' % self.format_text(result.find('abstract').text)
+            if result.find('mdurl') is not None: d['url'] = self.format_url(result.find('mdurl').text)
+	    
 
             ans.append(d)
 
+	print('Exiting get_matches  ...')
         return ans
 
 
@@ -96,7 +104,6 @@ class Arxiv(NetbibBase):
 
         return None
 
-
     def get_abstract(self, bibid):
         ans = self.get_item(bibid)
 
@@ -107,13 +114,25 @@ class Arxiv(NetbibBase):
 
 
     def format_query(self, d, lax=False):
-        """Formats a query suitable to send to the arxiv API"""
+        """Formats a query suitable to send to the IEEEXplore API"""
         for k in d.keys():
             if not k in self.search_fields:
-                raise ArxivError("Error in Arxiv. Don't understand key: %s" % k)
+                raise IEEEXploreError("Error in IEEEXplore. Don't understand key: %s" % k)
 
         if 'id' in d.keys():
-            params = {'id_list': d['id'], 'start': '0', 'max_results': '1'}
+            params = {'an': d['id']}
+            return params
+
+	elif 'isbn' in d.keys():
+            params = {'isbn': d['isbn']}
+            return params
+
+	elif 'issn' in d.keys():
+            params = {'issn': d['issn']}
+            return params
+
+	elif 'doi' in d.keys():
+            params = {'doi': d['doi']}
             return params
 
         elif 'title' in d.keys() or 'authors' in d.keys():
@@ -129,20 +148,13 @@ class Arxiv(NetbibBase):
                 words = [surname(a) for a in d['authors']]
                 for b in words: items.append('au:' + self.clean_query(b))
 
-            params = {'search_query': " AND ".join(items),
-                      'start': 0,
-                      'max_results': str(self.query_maxresults)}
+            params = {items,
+                      'rs': 1,
+                      'bc': str(self.query_maxresults)}
             return params
 
         else:
-            raise ArxivError("Error in Arxiv. Insuficient metadata to construct a query")
+            raise IEEEXploreError("Error in IEEEXplore. Insuficient metadata to construct a query")
             return None
 
 
-
-    # Utility stuff
-    # ------------------------------ #
-
-    def format_id(self, url):
-        m = re.match("http://arxiv.org/abs/(.*)", url)
-        return m.group(1).strip()

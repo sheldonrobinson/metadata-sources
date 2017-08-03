@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# netbib - collect bibliographical data over the net
-# Copyright 2012 Abdó Roig-Maranges <abdo.roig@gmail.com>
+# calibre-metadata - A collection of metadata sources for calibre
+# Copyright 2013 Abdó Roig-Maranges <abdo.roig@gmail.com>
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -17,7 +17,4 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .zentralblatt import Zentralblatt
 from .mathscinet import Mathscinet
-from .ieeexplore import IEEEXplore
-from .arxiv import Arxiv

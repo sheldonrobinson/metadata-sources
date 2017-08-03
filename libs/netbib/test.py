@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # netbib - collect bibliographical data over the net
@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import (unicode_literals, division)
+from __future__ import (unicode_literals, division, print_function)
 
 import sys
 
@@ -30,6 +30,7 @@ else:
 from .zentralblatt import Zentralblatt
 from .mathscinet import Mathscinet
 from .arxiv import Arxiv
+from .ieeexplore import IEEEXplore
 # from .inspire import Inspire
 
 
@@ -53,6 +54,10 @@ def test():
 
     print("Mathscinet")
     test_source(src = Mathscinet(browser), query={'authors': ['Kontsevich']})
+
+    print("IEEEXpplore") 
+    test_source(src = IEEEXplore(browser), query={'authors': ['Kontsevich']})
+    test_source(src = IEEEXplore(browser), query={'id': '4771287'})
 
     # print("Inspire")
     # test_source(src = Inspire(browser), query={'authors': ['Kontsevich']})

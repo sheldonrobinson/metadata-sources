@@ -60,9 +60,13 @@ class MySource(Source):
         d = {}
         idval = identifiers.get(self.idkey, None)
         isbn = identifiers.get('isbn', None)
+	issn = identifiers.get('issn', None)
+	doi = identifiers.get('doi', None)
 
         if idval: d['id'] = idval
         if isbn: d['isbn'] = isbn
+	if issn: d['issn'] = issn
+	if doi: d['doi'] = doi
         if title: d['title'] = title
         if authors: d['authors'] = authors
 
@@ -110,6 +114,7 @@ class MySource(Source):
         if 'id' in item.keys(): mi.set_identifier(self.idkey, item['id'])
         if 'doi' in item.keys(): mi.set_identifier('doi', item['doi'])
         if 'isbn' in item.keys(): mi.set_identifier('isbn', item['isbn'])
+	if 'issn' in item.keys(): mi.set_identifier('issn', item['issn'])
 
         if 'updated' in item.keys(): mi.pubdate = parse_date(item['updated'], assume_utc=True)
 

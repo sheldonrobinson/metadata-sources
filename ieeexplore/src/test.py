@@ -1,7 +1,7 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# arxiv - arxiv plugin for calibre
+# mathscinet - mathscinet metadata plugin for calibre
 # Copyright 2012 Abdó Roig-Maranges <abdo.roig@gmail.com>
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import (unicode_literals, division)
+from __future__ import (unicode_literals, division, print_function)
 
 
 # Tests
@@ -29,25 +29,17 @@ if __name__ == '__main__':
          title_test, authors_test)
 
     tests_list = [
-        ({'identifiers': {'arxiv': "1412.7127v1"}},
-         {title_test("Surface Operators"),
-          authors_test(["Sergei Gukov"])}),
+#        ({'identifiers': {"an" : "5318908"}},
+#         {title_test("A 2D Barcode-Based Mobile Payment System"),
+#          authors_test(['Jerry Gao', 'Vijay Kulkarni', 'Himanshu Ranavat', 'Lee Chang', 'Hsing Mei'])}),
 
-        ({'title': "The Cobordism Category and Waldhausen's K-theory",
-          'authors': ['Marcel Bökstedt', 'Ib Madsen']},
-         [title_test("The Cobordism Category and Waldhausen's K-theory", exact=True)]),
+        ({'title': "A 2D Barcode-Based Mobile Payment System", 'authors':['Jerry Gao']},
+        {title_test("A 2D Barcode-Based Mobile Payment System", exact=True)})
 
-        ({'title': "knots fivebranes", 'authors':['Witten']},
-         [title_test("Fivebranes and Knots", exact=True),
-          authors_test(['Edward Witten'])]
-         ),
-
-        ({'title': "Fivebranes and knots", 'authors':['Witten']},
-         [title_test("Fivebranes and Knots", exact=True),
-          authors_test(['Edward Witten'])])
         ]
 
-    test_identify_plugin("Arxiv", tests_list)
+    print('Running test_identify_plugin(IEEEXplore) ...')
+    test_identify_plugin("IEEEXplore", tests_list)
 
 
 # vim: expandtab:shiftwidth=4:tabstop=4:softtabstop=4:textwidth=80

@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# zentralblatt - zentralblatt metadata plugin for calibre
+# IEEEXplore - IEEEXplore metadata plugin for calibre
 # Copyright 2012 Abdó Roig-Maranges <abdo.roig@gmail.com>
 #
 #   This program is free software: you can redistribute it and/or modify
@@ -23,46 +23,35 @@ import time
 import re
 
 from .mysource import MySource
-from .netbib.zentralblatt import Zentralblatt as ZentralblattWorker
+from .netbib.ieeexplore import IEEEXplore as IEEEXploreWorker
 
 from calibre.ebooks.metadata.sources.base import Option
 from calibre.ebooks.metadata.book.base import Metadata
 
-
-class Zentralblatt(MySource):
-    name                    = 'Zentralblatt'
-    description             = _('Downloads metadata from Zentralblatt')
-    author                  = 'Abdó Roig-Maranges'
+class IEEEXplore(MySource):
+    name                    = 'IEEEXplore'
+    description             = _('Downloads metadata from IEEEXplore')
+    author                  = 'Sheldon Robinson'
     supported_platforms     = ['windows', 'osx', 'linux']
     version                 = (1,3,0)
     minimum_calibre_version = (1,0,0)
 
     capabilities = frozenset(['identify'])
-    touched_fields = frozenset(['identifier:zbl', 'identifier:doi', 'identifier:isbn',
-                                'title', 'authors', 'comments', 'publisher', 'pubdate',
-                                'languages', 'series', 'series_index', 'tags'])
+    touched_fields = frozenset(['identifier:an','identifier:isbn','identifier:doi','identifier:isbn',
+                                'title', 'authors', 'comments', 'publisher','languages',
+                                'pubdate', 'series', 'series_index', 'tags'])
+
 
     # Plugin Options
     has_html_comments = True
     supports_gzip_transfer_encoding = False
 
     # My Options
-    idkey = 'zbl'
-    maxresults = 5
+    idkey = 'an'
+    maxresults = 1
     sleep_time = 0.5
-    worker_class = ZentralblattWorker
-    abstract_title = "Zentralblatt Review:"
-
-
-    def get_book_url(self, identifiers):
-        """Produces an url for the zbl identifier"""
-        if 'zbl' in identifiers.keys():
-            zbl = identifiers['zbl']
-            url = "https://zbmath.org?q=an:%s" % zbl
-            return ("zbl", zbl, url)
-        else:
-            return None
-
+    worker_class = IEEEXploreWorker
+    abstract_title = "Abstract:"
 
 
 

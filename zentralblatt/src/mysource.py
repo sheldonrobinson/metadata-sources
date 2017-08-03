@@ -1,1 +1,1 @@
-../../libs/mysource.py
+/f/Repositories/metadata-sources/libs/mysource.py

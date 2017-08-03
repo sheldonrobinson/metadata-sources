@@ -1,5 +1,5 @@
 
-PLUGINS=arxiv mathscinet zentralblatt
+PLUGINS=arxiv ieeexplore mathscinet zentralblatt
 
 .PHONY: clean install all test
 
