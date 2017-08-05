@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
 # netbib - collect bibliographical data over the net
@@ -87,7 +87,7 @@ class Arxiv(NetbibBase):
         return ans
 
 
-    def get_item(self, bibid):
+    def get_item(self, bibid): # {{{
         params = self.format_query({'id': bibid})
         ans = self.get_matches(params)
 
@@ -96,15 +96,31 @@ class Arxiv(NetbibBase):
 
         return None
 
+    # }}}
 
-    def get_abstract(self, bibid):
+    def get_abstract(self, bibid): # {{{
         ans = self.get_item(bibid)
 
-        if 'abstract' in ans:
-            return ans['abstract']
+	if ans is not None:
+        	if 'abstract' in ans:
+            		return ans['abstract']
 
         return None
 
+    # }}}
+
+    def get_book_url(self, identifiers): # {{{
+    	arnumber = identifiers.get('arnumber', None)
+
+     	if arnumber is not None:
+            ans = self.get_item(arnumber)
+            if ans is None:
+                return None
+        if 'url' in ans:
+            return ans['url']
+        return None
+
+     # }}}
 
     def format_query(self, d, lax=False):
         """Formats a query suitable to send to the arxiv API"""

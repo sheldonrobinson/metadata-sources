@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
 # arxiv - arxiv plugin for calibre
@@ -19,6 +19,7 @@
 
 from __future__ import (unicode_literals, division)
 
+from arxiv import Arxiv
 
 # Tests
 # To run these test use:
@@ -47,7 +48,7 @@ if __name__ == '__main__':
           authors_test(['Edward Witten'])])
         ]
 
-    test_identify_plugin("Arxiv", tests_list)
+    test_identify_plugin('Arxiv', tests_list)
 
 
 # vim: expandtab:shiftwidth=4:tabstop=4:softtabstop=4:textwidth=80

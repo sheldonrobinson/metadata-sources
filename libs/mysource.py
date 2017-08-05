@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
 # mathscinet - mathscinet metadata plugin for calibre
@@ -60,13 +60,13 @@ class MySource(Source):
         d = {}
         idval = identifiers.get(self.idkey, None)
         isbn = identifiers.get('isbn', None)
-	issn = identifiers.get('issn', None)
-	doi = identifiers.get('doi', None)
+	    issn = identifiers.get('issn', None)
+	    doi = identifiers.get('doi', None)
 
         if idval: d['id'] = idval
         if isbn: d['isbn'] = isbn
-	if issn: d['issn'] = issn
-	if doi: d['doi'] = doi
+	    if issn: d['issn'] = issn
+	    if doi: d['doi'] = doi
         if title: d['title'] = title
         if authors: d['authors'] = authors
 

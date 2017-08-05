@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
 # mathscinet - mathscinet metadata plugin for calibre
@@ -29,7 +29,7 @@ if __name__ == '__main__':
          title_test, authors_test)
 
     tests_list = [
-        ({'identifiers': {"an" : "5318908"}},
+        ({'identifiers': {"arnumber" : "5318908"}},
          [title_test("A 2D Barcode-Based Mobile Payment System"),
           authors_test(['Jerry Gao', 'Vijay Kulkarni', 'Himanshu Ranavat', 'Lee Chang', 'Hsing Mei'])]),
 
@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
         ]
 
-    test_identify_plugin("IEEEXplore", tests_list)
+    test_identify_plugin(IEEEXplore, tests_list)
 
 
 # vim: expandtab:shiftwidth=4:tabstop=4:softtabstop=4:textwidth=80

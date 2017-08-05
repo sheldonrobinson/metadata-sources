@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
 # netbib - collect bibliographical data over the net
@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import (unicode_literals, division, priint_function)
+from __future__ import (unicode_literals, division)
 
 import time
 import sys
@@ -45,8 +45,8 @@ class IEEEXplore(NetbibBase):
         super(IEEEXplore, self).__init__()
         self.query_maxresults = 100
 
-        self.search_fields = ['title', 'authors', 'id']
-        self.idkey = 'an'
+        self.search_fields = ['title','authors', 'id', 'isbn', 'issn', 'doi']
+        self.idkey = 'arnumber'
 
         self.timeout = timeout
         self.browser = browser
@@ -102,11 +102,24 @@ class IEEEXplore(NetbibBase):
     def get_abstract(self, bibid):
         ans = self.get_item(bibid)
 
-        if 'abstract' in ans:
-            return ans['abstract']
+	if ans is not None:
+        	if 'abstract' in ans:
+            		return ans['abstract']
 
         return None
 
+    def get_book_url(self, identifiers): # {{{
+    	arnumber = identifiers.get('arnumber', None)
+
+     	if arnumber is not None:
+            ans = self.get_item(arnumber)
+            if ans is None:
+                return None
+        if 'url' in ans:
+            return ans['url']
+        return None
+
+     # }}}
 
     def format_query(self, d, lax=False):
         """Formats a query suitable to send to the IEEEXplore API"""
@@ -143,9 +156,7 @@ class IEEEXplore(NetbibBase):
                 words = [surname(a) for a in d['authors']]
                 for b in words: items.append('au:' + self.clean_query(b))
 
-            params = {items,
-                      'rs': 1,
-                      'bc': str(self.query_maxresults)}
+            params = items.append('rs:'+str(1),'bc:'+ str(self.query_maxresults))
             return params
 
         else:

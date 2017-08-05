@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
 # arxiv - arxiv plugin for calibre
@@ -22,8 +22,8 @@ from __future__ import (unicode_literals, division)
 import time
 import re
 
-from .mysource import MySource
-from .netbib.arxiv import Arxiv as ArxivWorker
+from mysource import MySource
+from netbib.arxiv import Arxiv as ArxivWorker
 
 from calibre.ebooks.metadata.sources.base import Option
 from calibre.ebooks.metadata.book.base import Metadata

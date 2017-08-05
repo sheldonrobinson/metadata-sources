@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
 # mathscinet - mathscinet metadata plugin for calibre
@@ -24,8 +24,8 @@ from xml.sax.saxutils import escape
 import time
 import re
 
-from .netbib.utils import metadata_distance
-from .tags import msc_tags, arxiv_tags
+from netbib.utils import metadata_distance
+from tags import msc_tags, arxiv_tags
 
 from calibre.utils.browser import Browser
 from calibre.ebooks.metadata.sources.base import Source, Option

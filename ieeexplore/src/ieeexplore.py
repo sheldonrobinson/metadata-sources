@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
 # IEEEXplore - IEEEXplore metadata plugin for calibre
@@ -37,7 +37,7 @@ class IEEEXplore(MySource):
     minimum_calibre_version = (1,0,0)
 
     capabilities = frozenset(['identify'])
-    touched_fields = frozenset(['identifier:an','identifier:isbn','identifier:doi','identifier:isbn',
+    touched_fields = frozenset(['identifier:arnumber','identifier:isbn','identifier:doi','identifier:isbn',
                                 'title', 'authors', 'comments', 'publisher','languages',
                                 'pubdate', 'series', 'series_index', 'tags'])
 
@@ -47,7 +47,7 @@ class IEEEXplore(MySource):
     supports_gzip_transfer_encoding = False
 
     # My Options
-    idkey = 'an'
+    idkey = 'arnumber'
     maxresults = 1
     sleep_time = 0.5
     worker_class = IEEEXploreWorker
