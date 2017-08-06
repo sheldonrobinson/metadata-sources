@@ -33,7 +33,7 @@ class Mathscinet(MySource):
     description             = _('Downloads metadata from Mathscinet')
     author                  = 'Abdó Roig-Maranges'
     supported_platforms     = ['windows', 'osx', 'linux']
-    version                 = (1,3,0)
+    version                 = (1,4,0)
     minimum_calibre_version = (1,0,0)
 
     capabilities = frozenset(['identify'])

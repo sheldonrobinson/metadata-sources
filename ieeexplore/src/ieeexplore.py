@@ -33,7 +33,7 @@ class IEEEXplore(MySource):
     description             = _('Downloads metadata from IEEEXplore')
     author                  = 'Sheldon Robinson'
     supported_platforms     = ['windows', 'osx', 'linux']
-    version                 = (1,3,0)
+    version                 = (1,4,0)
     minimum_calibre_version = (1,0,0)
 
     capabilities = frozenset(['identify'])
