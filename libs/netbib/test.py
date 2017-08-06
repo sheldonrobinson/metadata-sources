@@ -55,7 +55,7 @@ def test():
     print("Mathscinet")
     test_source(src = Mathscinet(browser), query={'authors': ['Kontsevich']})
 
-    print("IEEEXpplore")
+    print("IEEEXplore")
     test_source(src = IEEEXplore(browser), query={'id': '4771287'})
 
     # print("Inspire")

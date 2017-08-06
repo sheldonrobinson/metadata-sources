@@ -25,9 +25,9 @@ import re
 import xml.etree.ElementTree
 
 if sys.version_info[0] >= 3:
-    from urllib.parse import urlencode
+   from urllib.parse import urlencode
 else:
-    from urllib import urlencode
+   from urllib import urlencode
 
 import unicodedata
 
@@ -42,123 +42,115 @@ class ArxivError(NetbibError):
 
 class Arxiv(NetbibBase):
     def __init__(self, browser, timeout=30):
-        super(Arxiv, self).__init__()
+    	super(Arxiv, self).__init__()
 
-        self.query_maxresults = 100
+    	self.query_maxresults = 100
 
-        self.search_fields = ['title', 'authors', 'id']
-        self.idkey = 'arxiv'
+    	self.search_fields = ['title', 'authors', 'id']
+    	self.idkey = 'arxiv'
+    	self.timeout = timeout
+    	self.browser = browser
+    	self.sleep_time = 0.2
 
-        self.timeout = timeout
-        self.browser = browser
-        self.sleep_time = 0.2
-
-        self.arxiv_url = "http://export.arxiv.org/api/query"
-        self.ans = []
+    	self.arxiv_url = "http://export.arxiv.org/api/query"
+    	self.ans = []
 
 
 
     # Internals
     # ------------------------------ #
-
     def get_matches(self, params):
-        at = "{http://www.w3.org/2005/Atom}"
-        query_url = '%s?%s' % (self.arxiv_url, urlencode(params))
-        raw = self.browser.open(query_url, timeout=self.timeout).read().strip()
-        rawdata = raw.decode('utf-8', errors='replace')
-        xmldata = xml.etree.ElementTree.fromstring(rawdata)
-        entries = xmldata.findall(at+"entry")
+    	at = "{http://www.w3.org/2005/Atom}"
+    	query_url = '%s?%s' % (self.arxiv_url, urlencode(params))
+    	raw = self.browser.open(query_url, timeout=self.timeout).read().strip()
+    	rawdata = raw.decode('utf-8', errors='replace')
+    	xmldata = xml.etree.ElementTree.fromstring(rawdata)
+    	entries = xmldata.findall(at+"entry")
 
-        ans = []
-        for result in entries:
-            d = {}
-            d['id'] = self.format_id(result.find(at+'id').text)
-            d['title'] = self.format_title(result.find(at+'title').text)
-            d['authors'] = [self.format_text(e.text) for e in result.findall(at+'author/'+at+'name')]
-            d['subject'] = [self.format_text(e.get('term')) for e in result.findall(at+'category')]
-            d['updated'] = self.format_text(result.find(at+'updated').text)
-            d['abstract'] = '<p>%s</p>' % self.format_text(result.find(at+'summary').text)
-            d['updated'] = self.format_text(result.find(at+'updated').text)
-	    d['pubdate'] = self.format_text(result.find(at+'published').text)
-            d['url'] = self.format_url(result.find(at+'link').get('href'))
+    	ans = []
+    	for result in entries:
+    	   d = {}
+    	   d['id'] = self.format_id(result.find(at+'id').text)
+    	   d['title'] = self.format_title(result.find(at+'title').text)
+    	   d['authors'] = [self.format_text(e.text) for e in result.findall(at+'author/'+at+'name')]
+    	   d['subject'] = [self.format_text(e.get('term')) for e in result.findall(at+'category')]
+    	   d['updated'] = self.format_text(result.find(at+'updated').text)
+    	   d['abstract'] = '<p>%s</p>' % self.format_text(result.find(at+'summary').text)
+    	   d['updated'] = self.format_text(result.find(at+'updated').text)
+    	   d['pubdate'] = self.format_text(result.find(at+'published').text)
+    	   if result.find(at+"link[@title='pdf']") is not None: d['url'] = self.format_url(result.find(at+"link[@title='pdf']").get('href'))
 
-            ans.append(d)
+    	   ans.append(d)
 
-        return ans
+    	return ans
 
 
-    def get_item(self, bibid): # {{{
-        params = self.format_query({'id': bibid})
-        ans = self.get_matches(params)
+    def get_item(self, bibid):
+    	params = self.format_query({'id': bibid})
+    	ans = self.get_matches(params)
 
-        if len(ans) > 0:
-            return ans[0]
+    	if len(ans) > 0:
+    	   return ans[0]
+    	return None
 
-        return None
 
-    # }}}
+    def get_abstract(self, bibid):
+    	ans = self.get_item(bibid)
 
-    def get_abstract(self, bibid): # {{{
-        ans = self.get_item(bibid)
+    	if ans is not None:
+    	   if 'abstract' in ans:
+    	   	return ans['abstract']
+    	return None
 
-	if ans is not None:
-        	if 'abstract' in ans:
-            		return ans['abstract']
+    def get_book_url(self, identifiers):
+    	arxiv = identifiers.get('arxiv', None)
 
-        return None
-
-    # }}}
-
-    def get_book_url(self, identifiers): # {{{
-    	arnumber = identifiers.get('arnumber', None)
-
-     	if arnumber is not None:
-            ans = self.get_item(arnumber)
-            if ans is None:
-                return None
-        if 'url' in ans:
-            return ans['url']
-        return None
-
-     # }}}
+    	if arxiv is not None:
+    	   ans = self.get_item(arxiv)
+    	   if ans is None:
+    	   	return None
+    	   if 'url' in ans:
+    	   	return ans['url']
+    	return None
 
     def format_query(self, d, lax=False):
-        """Formats a query suitable to send to the arxiv API"""
-        for k in d.keys():
-            if not k in self.search_fields:
-                raise ArxivError("Error in Arxiv. Don't understand key: %s" % k)
+    	"""Formats a query suitable to send to the arxiv API"""
+    	for k in d.keys():
+    	   if not k in self.search_fields:
+    	    raise ArxivError("Error in Arxiv. Don't understand key: %s" % k)
 
-        if 'id' in d.keys():
-            params = {'id_list': d['id'], 'start': '0', 'max_results': '1'}
-            return params
+    	if 'id' in d.keys():
+    	   params = {'id_list': d['id'], 'start': '0', 'max_results': '1'}
+    	   return params
 
-        elif 'title' in d.keys() or 'authors' in d.keys():
-            items = []
-            if 'title' in d.keys():
-                if lax:
-                    words = d['title'].split(' ')
-                    for b in words: items.append('ti:' + self.clean_query(b))
-                else:
-                    items.append('ti:' + ('"%s"' % self.clean_query(d['title'])))
+    	elif 'title' in d.keys() or 'authors' in d.keys():
+    	   items = []
+    	   if 'title' in d.keys():
+    	   	if lax:
+    	   	   words = d['title'].split(' ')
+    	   	   for b in words: items.append('ti:' + self.clean_query(b))
+    	   	else:
+    	   	   items.append('ti:' + ('"%s"' % self.clean_query(d['title'])))
 
-            if 'authors' in d.keys():
-                words = [surname(a) for a in d['authors']]
-                for b in words: items.append('au:' + self.clean_query(b))
+    	   if 'authors' in d.keys():
+    	   	words = [surname(a) for a in d['authors']]
+    	   	for b in words: items.append('au:' + self.clean_query(b))
 
-            params = {'search_query': " AND ".join(items),
-                      'start': 0,
-                      'max_results': str(self.query_maxresults)}
-            return params
+    	   params = {'search_query': " AND ".join(items),
+			'start': 0,
+			'max_results': str(self.query_maxresults)}
+    	   return params
 
-        else:
-            raise ArxivError("Error in Arxiv. Insuficient metadata to construct a query")
-            return None
+    	else:
+    	   raise ArxivError("Error in Arxiv. Insuficient metadata to construct a query")
 
+    	return None
 
 
     # Utility stuff
     # ------------------------------ #
 
     def format_id(self, url):
-        m = re.match("http://arxiv.org/abs/(.*)", url)
-        return m.group(1).strip()
+    	m = re.match("http://arxiv.org/abs/(.*)", url)
+    	return m.group(1).strip()
+

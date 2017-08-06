@@ -17,7 +17,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import (unicode_literals, division)
+from __future__ import (unicode_literals, division, print_function)
 
 import time
 import sys
@@ -35,132 +35,116 @@ from .utils import surname, strip_accents
 from .base import NetbibBase, NetbibError
 
 
-
 class IEEEXploreError(NetbibError):
-    pass
+     pass
 
 
 class IEEEXplore(NetbibBase):
     def __init__(self, browser, timeout=30):
-        super(IEEEXplore, self).__init__()
-        self.query_maxresults = 100
+     	super(IEEEXplore, self).__init__()
+     	self.query_maxresults = 100
+     	self.search_fields = ['title','authors', 'id']
+     	self.idkey = 'arnumber'
 
-        self.search_fields = ['title','authors', 'id', 'isbn', 'issn', 'doi']
-        self.idkey = 'arnumber'
+     	self.timeout = timeout
+     	self.browser = browser
+     	self.sleep_time = 0.2
 
-        self.timeout = timeout
-        self.browser = browser
-        self.sleep_time = 0.2
-
-        self.ieeexplore_url = "http://ieeexplore.ieee.org/gateway/ipsSearch.jsp"
-        self.ans = []
+     	self.ieeexplore_url = "http://ieeexplore.ieee.org/gateway/ipsSearch.jsp"
+     	self.ans = []
 
 
     # Internals
     # ------------------------------ #
+    def get_matches(self, params): 
+    	query_url = '%s?%s' % (self.ieeexplore_url, urlencode(params))
+    	raw = self.browser.open(query_url, timeout=self.timeout).read().strip()
+    	rawdata = raw.decode('utf-8', errors='replace')
+    	xmldata = xml.etree.ElementTree.fromstring(rawdata)
+    	entries = xmldata.findall("document")
 
-    def get_matches(self, params):
-        query_url = '%s?%s' % (self.ieeexplore_url, urlencode(params))
-        raw = self.browser.open(query_url, timeout=self.timeout).read().strip()
-        rawdata = raw.decode('utf-8', errors='replace')
-        xmldata = xml.etree.ElementTree.fromstring(rawdata)
-        entries = xmldata.findall("document")
+    	ans = []
+    	for result in entries:
+    	    d = {}
+    	    d['id'] = result.find('arnumber').text
+    	    if result.find('isbn') is not None: d['isbn'] = result.find('isbn').text
+    	    if result.find('issn') is not None: d['issn'] = result.find('issn').text
+    	    if result.find('doi') is not None: d['doi'] = result.find('doi').text
+    	    d['title'] = self.format_title(result.find('title').text)
+    	    d['authors'] = [self.format_text(e) for e in result.find('authors').text.split(';')]
+    	    terms = result.findall('thesaurusterms/term') + result.findall('controlledterms/term')
+    	    d['subject'] = [self.format_text(e.text) for e in terms]
+    	    if result.find('pubtitle') is not None:  d['series'] = self.format_text(result.find('pubtitle').text)
+    	    if result.find('py') is not None: d['year'] = self.format_text(result.find('py').text)
+    	    if result.find('publisher') is not None: d['publisher'] = self.format_text(result.find('publisher').text)
+    	    if result.find('volume') is not None: d['volume'] = self.format_text(result.find('volume').text)
+    	    if result.find('issue') is not None: d['number'] = self.format_text(result.find('issue').text)
+    	    d['abstract'] = '<p>%s</p>' % self.format_text(result.find('abstract').text)
+    	    if result.find('mdurl') is not None: d['url'] = self.format_url(result.find('mdurl').text)
 
-        ans = []
-        for result in entries:
-            d = {}
-            d['id'] = result.find('arnumber').text
-	    if result.find('isbn') is not None: d['isbn'] = result.find('isbn').text
-	    if result.find('issn') is not None: d['issn'] = result.find('issn').text
-	    if result.find('doi') is not None: d['doi'] = result.find('doi').text
-            d['title'] = self.format_title(result.find('title').text)
-            d['authors'] = [self.format_text(e.text) for e in result.find('authors').text.split(';')]
-            d['subject'] = [self.format_text(e.text) for e in [result.findall('controlledterms/term'), result.findall('thesaurusterms/term')]]
-	    if result.find('pubtitle') is not None:  d['series'] = self.format_text(result.find('pubtitle').text)
-	    if result.find('py') is not None: d['year'] = self.format_text(result.find('py').text)
-	    if result.find('publisher') is not None: d['publisher'] = self.format_text(result.find('publisher').text)
-	    if result.find('volume') is not None: d['volume'] = self.format_text(result.find('volume').text)
-	    if result.find('issue') is not None: d['number'] = self.format_text(result.find('issue').text)
-            d['abstract'] = '<p>%s</p>' % self.format_text(result.find('abstract').text)
-            if result.find('mdurl') is not None: d['url'] = self.format_url(result.find('mdurl').text)
+    	    ans.append(d)
 
-
-            ans.append(d)
-
-        return ans
+    	return ans
 
 
     def get_item(self, bibid):
-        params = self.format_query({'id': bibid})
-        ans = self.get_matches(params)
+    	params = self.format_query({'id': bibid})
+    	ans = self.get_matches(params)
 
-        if len(ans) > 0:
-            return ans[0]
+    	if len(ans) > 0:
+    	   return ans[0]
 
-        return None
+    	return None
+
 
     def get_abstract(self, bibid):
-        ans = self.get_item(bibid)
+    	ans = self.get_item(bibid)
 
-	if ans is not None:
-        	if 'abstract' in ans:
-            		return ans['abstract']
+    	if ans is not None:
+    	   if 'abstract' in ans:
+    	   	return ans['abstract']
+    	return None
 
-        return None
 
-    def get_book_url(self, identifiers): # {{{
+    def get_book_url(self, identifiers):
     	arnumber = identifiers.get('arnumber', None)
 
-     	if arnumber is not None:
-            ans = self.get_item(arnumber)
-            if ans is None:
-                return None
-        if 'url' in ans:
-            return ans['url']
-        return None
+    	if arnumber is not None:
+    	   ans = self.get_item(arnumber)
+    	   if ans is None:
+    	   	return None
+    	   if 'url' in ans:
+    	   	return ans['url']
+    	return None
 
-     # }}}
 
     def format_query(self, d, lax=False):
-        """Formats a query suitable to send to the IEEEXplore API"""
-        for k in d.keys():
-            if not k in self.search_fields:
-                raise IEEEXploreError("Error in IEEEXplore. Don't understand key: %s" % k)
+    	"""Formats a query suitable to send to the IEEEXplore API"""
+    	for k in d.keys():
+    	   if not k in self.search_fields:
+    	   	raise IEEEXploreError("Error in IEEEXplore. Don't understand key: %s" % k)
+    	if 'id' in d.keys():
+    	   params = {'an': d['id']}
+    	   return params
 
-        if 'id' in d.keys():
-            params = {'an': d['id']}
-            return params
+    	elif 'title' in d.keys() or 'authors' in d.keys():
+    	   items = []
+    	   if 'title' in d.keys():
+    	   	if lax:
+    	   	   words = d['title'].split(' ')
+    	   	   for b in words: items.append('ti:' + self.clean_query(b))
+    	   	else:
+    	   	   items.append('ti:' + ('"%s"' % self.clean_query(d['title'])))
 
-	elif 'isbn' in d.keys():
-            params = {'isbn': d['isbn']}
-            return params
+    	if 'authors' in d.keys():
+    	   words = [surname(a) for a in d['authors']]
+    	   for b in words: items.append('au:' + self.clean_query(b))
+    	   params = items.append('rs:'+str(1),'bc:'+ str(self.query_maxresults))
+    	   return params
 
-	elif 'issn' in d.keys():
-            params = {'issn': d['issn']}
-            return params
+    	else:
+    	   raise IEEEXploreError("Error in IEEEXplore. Insuficient metadata to construct a query")
 
-	elif 'doi' in d.keys():
-            params = {'doi': d['doi']}
-            return params
-
-        elif 'title' in d.keys() or 'authors' in d.keys():
-            items = []
-            if 'title' in d.keys():
-                if lax:
-                    words = d['title'].split(' ')
-                    for b in words: items.append('ti:' + self.clean_query(b))
-                else:
-                    items.append('ti:' + ('"%s"' % self.clean_query(d['title'])))
-
-            if 'authors' in d.keys():
-                words = [surname(a) for a in d['authors']]
-                for b in words: items.append('au:' + self.clean_query(b))
-
-            params = items.append('rs:'+str(1),'bc:'+ str(self.query_maxresults))
-            return params
-
-        else:
-            raise IEEEXploreError("Error in IEEEXplore. Insuficient metadata to construct a query")
-            return None
+    	return None
 
 

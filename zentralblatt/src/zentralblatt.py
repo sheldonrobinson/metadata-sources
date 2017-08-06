@@ -22,8 +22,8 @@ from __future__ import (unicode_literals, division)
 import time
 import re
 
-from .mysource import MySource
-from .netbib.zentralblatt import Zentralblatt as ZentralblattWorker
+from mysource import MySource
+from netbib.zentralblatt import Zentralblatt as ZentralblattWorker
 
 from calibre.ebooks.metadata.sources.base import Option
 from calibre.ebooks.metadata.book.base import Metadata

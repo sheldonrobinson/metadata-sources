@@ -57,7 +57,6 @@ class Zentralblatt(NetbibBase):
 
     # Internals
     # ------------------------------ #
-
     def entry_from_bibtex(self, bib):
         d = super(Zentralblatt, self).entry_from_bibtex(bib)
 

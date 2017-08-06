@@ -19,8 +19,6 @@
 
 from __future__ import (unicode_literals, division)
 
-from arxiv import Arxiv
-
 # Tests
 # To run these test use:
 # calibre-debug -e test.py

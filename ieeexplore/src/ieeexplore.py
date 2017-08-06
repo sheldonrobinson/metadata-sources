@@ -22,8 +22,8 @@ from __future__ import (unicode_literals, division)
 import time
 import re
 
-from .mysource import MySource
-from .netbib.ieeexplore import IEEEXplore as IEEEXploreWorker
+from mysource import MySource
+from netbib.ieeexplore import IEEEXplore as IEEEXploreWorker
 
 from calibre.ebooks.metadata.sources.base import Option
 from calibre.ebooks.metadata.book.base import Metadata
@@ -37,10 +37,8 @@ class IEEEXplore(MySource):
     minimum_calibre_version = (1,0,0)
 
     capabilities = frozenset(['identify'])
-    touched_fields = frozenset(['identifier:arnumber','identifier:isbn','identifier:doi','identifier:isbn',
-                                'title', 'authors', 'comments', 'publisher','languages',
-                                'pubdate', 'series', 'series_index', 'tags'])
-
+    touched_fields = frozenset(['identifier:arnumber', 'identifier:doi', 'identifier:isbn', 'title', 'authors', 'comments', 
+			'publisher', 'pubdate', 'series', 'series_index', 'tags'])
 
     # Plugin Options
     has_html_comments = True
@@ -48,11 +46,10 @@ class IEEEXplore(MySource):
 
     # My Options
     idkey = 'arnumber'
-    maxresults = 1
+    maxresults = 10
     sleep_time = 0.5
     worker_class = IEEEXploreWorker
     abstract_title = "Abstract:"
-
 
 
 # vim: expandtab:shiftwidth=4:tabstop=4:softtabstop=4:textwidth=80
