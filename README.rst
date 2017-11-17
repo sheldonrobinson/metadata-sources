@@ -10,7 +10,10 @@ Plugins
 
 :Arxiv:
    Fetches metadata from arxiv.org.
-   
+
+:IEEEXplore:
+   Fetches metadata from ieeexplore.org.
+
 :Mathscinet:
    Fetches metadata from Mathscinet. Requires subscription.
    
@@ -33,5 +36,6 @@ Links
 -----
 - http://calibre-ebook.com/
 - http://www.arxiv.org/
+- http://www.ieeexplore.org/
 - http://www.ams.org/mathscinet/
 - http://www.zentralblatt-math.org/zmath/en/
