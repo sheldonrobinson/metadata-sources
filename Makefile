@@ -22,7 +22,7 @@ linknetbib:
 	for iplg in $(PLUGINS); \
 	do \
 		rm $$iplg/src/netbib; \
-		cmd //c mklink //D "$$iplg\src\netbib" "libs\netbib"; \
+		cmd //c mklink //J "$$iplg\src\netbib" "libs\netbib"; \
 	done
 
 else
